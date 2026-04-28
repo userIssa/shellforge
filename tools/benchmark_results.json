@@ -1,0 +1,389 @@
+[
+  {
+    "profile": {
+      "id": "P01",
+      "label": "x86-64 Linux execve \u2014 no constraints",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [],
+      "null_free": false,
+      "msf_payload": "linux/x64/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 26,
+        "clean": true,
+        "time_ms": 0.33,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 141.76,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P02",
+      "label": "x86-64 Linux execve \u2014 null-free",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/x64/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 26,
+        "clean": true,
+        "time_ms": 0.12,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 125.3,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P03",
+      "label": "x86-64 Linux execve \u2014 bad chars 00,0a,0d",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00",
+        "0a",
+        "0d"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/x64/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00\\x0a\\x0d",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 26,
+        "clean": true,
+        "time_ms": 0.15,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 131.23,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P04",
+      "label": "x86-64 Linux execve \u2014 bad chars 00,0a,0d,20,2f",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00",
+        "0a",
+        "0d",
+        "20",
+        "2f"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/x64/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00\\x0a\\x0d\\x20\\x2f",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 49,
+        "clean": true,
+        "time_ms": 0.36,
+        "encoding": "XOR",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 128.56,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P05",
+      "label": "x86-64 Linux reverse shell \u2014 null-free",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "reverse_shell",
+      "bad_chars": [
+        "00"
+      ],
+      "null_free": true,
+      "goal_args": [
+        "127.0.0.1:4444"
+      ],
+      "msf_payload": "linux/x64/shell_reverse_tcp",
+      "msf_opts": "LHOST=127.0.0.1 LPORT=4444",
+      "msf_bad": "\\x00",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.connect('127.0.0.1',4444)+shellcraft.amd64.linux.dupsh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 120,
+        "clean": true,
+        "time_ms": 0.31,
+        "encoding": "XOR",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 134.85,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P06",
+      "label": "x86-32 Linux execve \u2014 null-free",
+      "arch": "x86_32",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/x86/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00",
+      "pwn_arch": "i386",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.i386.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 24,
+        "clean": true,
+        "time_ms": 0.17,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 125.57,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P07",
+      "label": "x86-32 Linux execve \u2014 bad chars 00,0a,0d,ff",
+      "arch": "x86_32",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00",
+        "0a",
+        "0d",
+        "ff"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/x86/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00\\x0a\\x0d\\xff",
+      "pwn_arch": "i386",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.i386.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 24,
+        "clean": true,
+        "time_ms": 0.1,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 134.69,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P08",
+      "label": "ARM Linux execve \u2014 null-free",
+      "arch": "arm",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/armle/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00",
+      "pwn_arch": "arm",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.arm.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 0.56,
+        "encoding": "\u2014",
+        "error": "Encoder could not avoid bad chars"
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 126.02,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P09",
+      "label": "MIPS Linux execve \u2014 null-free",
+      "arch": "mips",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [
+        "00"
+      ],
+      "null_free": true,
+      "msf_payload": "linux/mipsbe/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "msf_bad": "\\x00",
+      "pwn_arch": "mips",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.mips.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 0.35,
+        "encoding": "\u2014",
+        "error": "Encoder could not avoid bad chars"
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 141.49,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  },
+  {
+    "profile": {
+      "id": "P10",
+      "label": "x86-64 Linux execve \u2014 size budget 60 bytes",
+      "arch": "x86_64",
+      "os": "linux",
+      "goal": "exec_shell",
+      "bad_chars": [],
+      "null_free": false,
+      "size_budget": 60,
+      "msf_payload": "linux/x64/exec",
+      "msf_opts": "CMD=/bin/sh",
+      "pwn_arch": "amd64",
+      "pwn_os": "linux",
+      "pwn_shellcode": "shellcraft.amd64.linux.sh()"
+    },
+    "results": [
+      {
+        "tool": "ShellForge",
+        "ok": true,
+        "size": 26,
+        "clean": true,
+        "time_ms": 0.1,
+        "encoding": "NONE",
+        "error": ""
+      },
+      {
+        "tool": "pwntools",
+        "ok": false,
+        "size": 0,
+        "clean": false,
+        "time_ms": 133.13,
+        "error": "Traceback (most recent call last):\n  File \"<string>\", line 7, in <module>\n    from pwn import *\nModu"
+      }
+    ]
+  }
+]

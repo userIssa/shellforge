@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ShellForge</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg:       #0d1117;
+    --bg2:      #161b22;
+    --bg3:      #21262d;
+    --border:   #30363d;
+    --text:     #e6edf3;
+    --muted:    #8b949e;
+    --accent:   #58a6ff;
+    --green:    #3fb950;
+    --red:      #f85149;
+    --orange:   #d29922;
+    --purple:   #bc8cff;
+    --mono:     'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+  }
+
+  html, body { height: 100%; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; overflow: hidden; }
+
+  header { background: var(--bg2); border-bottom: 1px solid var(--border); padding: 14px 24px; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+  header .version { font-size: 11px; color: var(--muted); background: var(--bg3); border: 1px solid var(--border); border-radius: 4px; padding: 2px 8px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); margin-left: auto; }
+  .status-dot.offline { background: var(--red); }
+
+  .layout { display: grid; grid-template-columns: 320px 1fr; gap: 0; height: calc(100vh - 49px); overflow: hidden; }
+
+  .sidebar { background: var(--bg2); border-right: 1px solid var(--border); overflow-y: auto; display: flex; flex-direction: column; gap: 16px; padding: 16px; }
+
+  .panel { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; overflow: hidden; }
+  .panel-header { background: var(--bg3); border-bottom: 1px solid var(--border); padding: 8px 12px; font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; display: flex; align-items: center; gap: 6px; }
+  .panel-body { padding: 12px; }
+
+  label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 4px; margin-top: 10px; }
+  label:first-child { margin-top: 0; }
+
+  select, input[type="text"], input[type="number"], textarea {
+    width: 100%; background: var(--bg3); border: 1px solid var(--border); border-radius: 4px;
+    color: var(--text); padding: 7px 10px; font-size: 13px; outline: none;
+    transition: border-color 0.15s;
+  }
+  select:focus, input:focus, textarea:focus { border-color: var(--accent); }
+  textarea { resize: vertical; font-family: var(--mono); font-size: 12px; }
+
+  .checkbox-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .checkbox-row input[type="checkbox"] { width: 14px; height: 14px; accent-color: var(--accent); cursor: pointer; }
+  .checkbox-row label { margin: 0; color: var(--text); cursor: pointer; }
+
+  .btn { display: block; width: 100%; padding: 10px; border-radius: 6px; border: none; font-size: 14px; font-weight: 600; cursor: pointer; transition: opacity 0.15s, transform 0.1s; }
+  .btn:active { transform: scale(0.98); }
+  .btn-primary { background: var(--accent); color: #0d1117; }
+  .btn-primary:hover { opacity: 0.88; }
+  .btn-secondary { background: var(--bg3); color: var(--text); border: 1px solid var(--border); margin-top: 6px; }
+  .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .main { display: flex; flex-direction: column; overflow: hidden; }
+
+  .tabs { display: flex; background: var(--bg2); border-bottom: 1px solid var(--border); }
+  .tab { padding: 10px 20px; font-size: 13px; color: var(--muted); cursor: pointer; border-bottom: 2px solid transparent; transition: color 0.15s; user-select: none; }
+  .tab:hover { color: var(--text); }
+  .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .tab-content { flex: 1; overflow-y: auto; padding: 20px; display: none; }
+  .tab-content.active { display: block; }
+
+  .output-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 14px 16px; font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre-wrap; word-break: break-all; color: var(--green); min-height: 80px; }
+  .output-box.error { color: var(--red); }
+  .output-box.muted { color: var(--muted); font-family: inherit; }
+
+  .meta-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .meta-card { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; }
+  .meta-card .label { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+  .meta-card .value { font-size: 16px; font-weight: 600; color: var(--text); }
+  .meta-card .value.ok { color: var(--green); }
+  .meta-card .value.err { color: var(--red); }
+  .meta-card .value.enc { color: var(--purple); }
+
+  .section-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin: 16px 0 8px; }
+  .section-label:first-child { margin-top: 0; }
+
+  .hex-wrap { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; }
+  .hex-escaped { font-family: var(--mono); font-size: 12px; color: var(--orange); word-break: break-all; line-height: 1.8; }
+  .hex-dump { font-family: var(--mono); font-size: 12px; color: var(--muted); margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; white-space: pre; }
+  .hex-dump .offset { color: var(--muted); }
+  .hex-dump .byte  { color: var(--text); }
+
+  .disasm-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 12px 14px; font-family: var(--mono); font-size: 12px; line-height: 1.9; }
+  .disasm-box .op  { color: var(--accent); }
+  .disasm-box .reg { color: var(--purple); }
+  .disasm-box .num { color: var(--orange); }
+  .disasm-box .cmt { color: var(--muted); }
+
+  .annotation-box { background: var(--bg2); border: 1px solid var(--border); border-radius: 6px; padding: 16px; font-size: 13px; line-height: 1.8; color: var(--text); }
+  .annotation-box h3 { font-size: 13px; font-weight: 600; color: var(--accent); margin: 12px 0 6px; }
+  .annotation-box h3:first-child { margin-top: 0; }
+  .annotation-box p { margin-bottom: 8px; }
+  .annotation-box ul { margin: 4px 0 8px 18px; }
+  .annotation-box li { margin-bottom: 4px; }
+  .annotation-box code { background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px; font-family: var(--mono); font-size: 11px; color: var(--orange); }
+
+  .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .badge { display: inline-block; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; }
+  .badge-ok  { background: rgba(63,185,80,0.15); color: var(--green); }
+  .badge-err { background: rgba(248,81,73,0.15);  color: var(--red); }
+
+  .copy-btn { float: right; font-size: 11px; background: var(--bg3); border: 1px solid var(--border); border-radius: 3px; color: var(--muted); padding: 2px 8px; cursor: pointer; margin-top: -2px; }
+  .copy-btn:hover { color: var(--text); }
+
+  #api-url-input { font-family: var(--mono); font-size: 12px; }
+  .goal-args-hint { font-size: 11px; color: var(--muted); margin-top: 4px; font-style: italic; }
+  .empty-state { text-align: center; padding: 60px 20px; color: var(--muted); }
+  .empty-state .icon { font-size: 32px; margin-bottom: 12px; }
+  .empty-state p { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+    <path d="M10 2L3 6v4c0 4.4 3 8.5 7 9.5 4-1 7-5.1 7-9.5V6L10 2z" fill="#58a6ff" opacity="0.2" stroke="#58a6ff" stroke-width="1.5"/>
+    <path d="M7 10l2 2 4-4" stroke="#3fb950" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <h1>ShellForge</h1>
+  <span class="version" id="ver-badge">v0.3.0</span>
+  <div class="status-dot offline" id="status-dot" title="API status"></div>
+</header>
+
+<div class="layout">
+
+  <aside class="sidebar">
+
+    <div class="panel">
+      <div class="panel-header">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="6" cy="6" r="5" stroke="currentColor" fill="none" stroke-width="1.2"/><path d="M6 3v3l2 1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>
+        API
+      </div>
+      <div class="panel-body">
+        <label>Base URL</label>
+        <input type="text" id="api-url-input" value="http://127.0.0.1:5000" placeholder="http://127.0.0.1:5000">
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="1" y="1" width="10" height="10" rx="2"/><path d="M4 6h4M4 4h4M4 8h2"/></svg>
+        Constraints
+      </div>
+      <div class="panel-body">
+        <label>Architecture</label>
+        <select id="arch">
+          <option value="x86_64">x86_64</option>
+          <option value="x86_32">x86_32</option>
+          <option value="arm">ARM Thumb</option>
+          <option value="mips">MIPS BE</option>
+        </select>
+
+        <label>Operating system</label>
+        <select id="os">
+          <option value="linux">Linux</option>
+          <option value="windows">Windows</option>
+        </select>
+
+        <label>Goal</label>
+        <select id="goal" onchange="updateGoalHint()">
+          <option value="exec_shell">exec_shell</option>
+          <option value="reverse_shell">reverse_shell</option>
+          <option value="bind_shell">bind_shell</option>
+          <option value="arbitrary_write">arbitrary_write</option>
+        </select>
+
+        <label>Goal arguments</label>
+        <input type="text" id="goal-args" placeholder="e.g. 192.168.1.1:4444">
+        <div class="goal-args-hint" id="goal-hint">Not required for exec_shell</div>
+
+        <label>Bad chars (hex, comma-separated)</label>
+        <input type="text" id="bad-chars" placeholder="e.g. 00,0a,0d">
+
+        <label>Size budget (0 = unlimited)</label>
+        <input type="number" id="size-budget" value="0" min="0">
+
+        <label>Encoding</label>
+        <select id="encoding">
+          <option value="auto">auto</option>
+          <option value="xor">XOR</option>
+          <option value="add_sub">ADD/SUB</option>
+          <option value="none">none</option>
+        </select>
+
+        <div class="checkbox-row" style="margin-top:12px;">
+          <input type="checkbox" id="null-free">
+          <label for="null-free">null-free (\x00 banned)</label>
+        </div>
+        <div class="checkbox-row">
+          <input type="checkbox" id="newline-free">
+          <label for="newline-free">newline-free (\x0a\x0d banned)</label>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="synth-btn" onclick="synthesize()">Synthesize</button>
+    <button class="btn btn-secondary" id="annotate-btn" onclick="annotate()" disabled>Annotate with GPT-4o-mini</button>
+
+  </aside>
+
+  <main class="main">
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('output')">Output</div>
+      <div class="tab" onclick="switchTab('disasm')">Disassembly</div>
+      <div class="tab" onclick="switchTab('annotation')">Annotation</div>
+    </div>
+
+    <div class="tab-content active" id="tab-output">
+      <div class="empty-state" id="empty-output">
+        <div class="icon">⬡</div>
+        <p>Configure constraints and click Synthesize</p>
+      </div>
+      <div id="result-area" style="display:none;">
+        <div class="meta-grid">
+          <div class="meta-card"><div class="label">Status</div><div class="value" id="meta-status">—</div></div>
+          <div class="meta-card"><div class="label">Size</div><div class="value" id="meta-size">—</div></div>
+          <div class="meta-card"><div class="label">Encoding</div><div class="value enc" id="meta-enc">—</div></div>
+          <div class="meta-card"><div class="label">Arch</div><div class="value" id="meta-arch">—</div></div>
+          <div class="meta-card"><div class="label">OS</div><div class="value" id="meta-os">—</div></div>
+          <div class="meta-card"><div class="label">Goal</div><div class="value" id="meta-goal">—</div></div>
+        </div>
+
+        <div class="section-label">Escaped bytes <button class="copy-btn" onclick="copyText('hex-escaped-text')">copy</button></div>
+        <div class="hex-wrap">
+          <div class="hex-escaped" id="hex-escaped-text"></div>
+          <div class="hex-dump" id="hex-dump-text"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-disasm">
+      <div class="empty-state" id="empty-disasm">
+        <div class="icon">⬡</div>
+        <p>Disassembly appears here after synthesis</p>
+      </div>
+      <div id="disasm-area" style="display:none;">
+        <div class="section-label">Disassembly <button class="copy-btn" onclick="copyText('disasm-content')">copy</button></div>
+        <div class="disasm-box" id="disasm-content"></div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-annotation">
+      <div class="empty-state" id="empty-annotation">
+        <div class="icon">⬡</div>
+        <p>Run Synthesize then click "Annotate with GPT-4o-mini"</p>
+      </div>
+      <div id="annotation-area" style="display:none;">
+        <div class="section-label">GPT-4o-mini annotation</div>
+        <div class="annotation-box" id="annotation-content"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+let lastResult = null;
+
+function apiBase() {
+  return document.getElementById('api-url-input').value.replace(/\/$/, '');
+}
+
+async function checkHealth() {
+  try {
+    const r = await fetch(apiBase() + '/health', { signal: AbortSignal.timeout(3000) });
+    const d = await r.json();
+    const dot = document.getElementById('status-dot');
+    const ver = document.getElementById('ver-badge');
+    if (d.library) {
+      dot.className = 'status-dot';
+      ver.textContent = d.version.replace('ShellForge ', 'v');
+    } else {
+      dot.className = 'status-dot offline';
+    }
+  } catch {
+    document.getElementById('status-dot').className = 'status-dot offline';
+  }
+}
+
+function updateGoalHint() {
+  const hints = {
+    exec_shell:      'Not required for exec_shell',
+    reverse_shell:   'Required: 192.168.1.1:4444',
+    bind_shell:      'Required: port number e.g. 4444',
+    arbitrary_write: 'Required: 0xADDRESS,0xVALUE (two args)',
+  };
+  const goal = document.getElementById('goal').value;
+  document.getElementById('goal-hint').textContent = hints[goal] || '';
+}
+
+function buildPayload() {
+  const goal = document.getElementById('goal').value;
+  const argsRaw = document.getElementById('goal-args').value.trim();
+  let goalArgs = [];
+  if (argsRaw) {
+    if (goal === 'arbitrary_write') {
+      goalArgs = argsRaw.split(',').map(s => s.trim());
+    } else {
+      goalArgs = [argsRaw];
+    }
+  }
+
+  const badRaw = document.getElementById('bad-chars').value.trim();
+  const badChars = badRaw ? badRaw.split(',').map(s => s.trim()).filter(Boolean) : [];
+
+  return {
+    arch:         document.getElementById('arch').value,
+    os:           document.getElementById('os').value,
+    goal,
+    goal_args:    goalArgs,
+    bad_chars:    badChars,
+    size_budget:  parseInt(document.getElementById('size-budget').value) || 0,
+    encoding:     document.getElementById('encoding').value,
+    null_free:    document.getElementById('null-free').checked,
+    newline_free: document.getElementById('newline-free').checked,
+  };
+}
+
+function highlightDisasm(raw) {
+  if (!raw) return '<span style="color:var(--muted)">— no disassembly —</span>';
+  return raw.split('\n').map(line => {
+    if (!line.trim()) return '';
+    if (line.trim().startsWith(';')) return `<span class="cmt">${esc(line)}</span>`;
+    const parts = line.match(/^(\s*)(\S+)\s*(.*)/);
+    if (!parts) return esc(line);
+    const [, indent, op, rest] = parts;
+    const restH = rest
+      .replace(/(r[a-z]{2}|e[a-z]{2}|[re]sp|[re]bp|rip|eip|r\d+|r\d+[a-z]|v\d|a\d|t\d|s\d)/g, '<span class="reg">$1</span>')
+      .replace(/(0x[0-9a-fA-F]+|\b\d+\b)/g, '<span class="num">$1</span>')
+      .replace(/(;.*)$/, '<span class="cmt">$1</span>');
+    return `${esc(indent)}<span class="op">${esc(op)}</span> ${restH}`;
+  }).filter(Boolean).join('\n');
+}
+
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderAnnotation(text) {
+  if (!text) return '';
+  return text
+    .replace(/^### (.+)$/gm, '<h3>$1</h3>')
+    .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/^[-*] (.+)$/gm, '<li>$1</li>')
+    .replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>')
+    .replace(/\n\n/g, '</p><p>')
+    .replace(/^(?!<[hup])/gm, '')
+    .replace(/\n/g, '<br>');
+}
+
+async function synthesize() {
+  const btn = document.getElementById('synth-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Synthesizing…';
+
+  try {
+    const payload = buildPayload();
+    const resp = await fetch(apiBase() + '/synthesize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const data = await resp.json();
+    lastResult = data;
+    renderResult(data);
+    document.getElementById('annotate-btn').disabled = !data.ok;
+  } catch (e) {
+    showError('Request failed: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Synthesize';
+  }
+}
+
+function renderResult(data) {
+  document.getElementById('empty-output').style.display = 'none';
+  document.getElementById('result-area').style.display = 'block';
+
+  const ok = data.ok;
+  document.getElementById('meta-status').innerHTML =
+    `<span class="badge ${ok ? 'badge-ok' : 'badge-err'}">${data.status}</span>`;
+  document.getElementById('meta-size').textContent  = ok ? data.payload_len + ' bytes' : '—';
+  document.getElementById('meta-enc').textContent   = ok ? data.encoding_used : '—';
+  document.getElementById('meta-arch').textContent  = data.arch || '—';
+  document.getElementById('meta-os').textContent    = data.os   || '—';
+  document.getElementById('meta-goal').textContent  = data.goal || '—';
+
+  if (ok) {
+    document.getElementById('hex-escaped-text').textContent = data.payload_hex;
+    document.getElementById('hex-dump-text').textContent    = data.hex_dump;
+  } else {
+    document.getElementById('hex-escaped-text').textContent = data.error_msg || 'Synthesis failed';
+    document.getElementById('hex-dump-text').textContent    = '';
+  }
+
+  document.getElementById('empty-disasm').style.display = 'none';
+  document.getElementById('disasm-area').style.display  = 'block';
+  document.getElementById('disasm-content').innerHTML   = ok
+    ? highlightDisasm(data.disasm)
+    : `<span style="color:var(--red)">${esc(data.error_msg)}</span>`;
+
+  document.getElementById('empty-annotation').style.display = 'block';
+  document.getElementById('annotation-area').style.display  = 'none';
+}
+
+function showError(msg) {
+  document.getElementById('empty-output').style.display = 'none';
+  document.getElementById('result-area').style.display  = 'block';
+  document.getElementById('meta-status').innerHTML =
+    '<span class="badge badge-err">ERROR</span>';
+  document.getElementById('hex-escaped-text').textContent = msg;
+  document.getElementById('hex-dump-text').textContent    = '';
+}
+
+async function annotate() {
+  if (!lastResult || !lastResult.ok) return;
+  const btn = document.getElementById('annotate-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>Asking GPT-4o-mini…';
+  switchTab('annotation');
+
+  document.getElementById('empty-annotation').style.display  = 'none';
+  document.getElementById('annotation-area').style.display   = 'block';
+  document.getElementById('annotation-content').innerHTML    =
+    '<span class="spinner"></span> Waiting for GPT-4o-mini…';
+
+  try {
+    const resp = await fetch(apiBase() + '/annotate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        disasm:       lastResult.disasm,
+        arch:         lastResult.arch,
+        goal:         lastResult.goal,
+        encoding_used: lastResult.encoding_used,
+      }),
+    });
+    const data = await resp.json();
+    if (data.annotation) {
+      document.getElementById('annotation-content').innerHTML =
+        '<p>' + renderAnnotation(data.annotation) + '</p>';
+    } else {
+      document.getElementById('annotation-content').innerHTML =
+        `<span style="color:var(--red)">${esc(data.error || 'Annotation failed')}</span>`;
+    }
+  } catch (e) {
+    document.getElementById('annotation-content').innerHTML =
+      `<span style="color:var(--red)">Request failed: ${esc(e.message)}</span>`;
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Annotate with GPT-4o-mini';
+  }
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    const names = ['output','disasm','annotation'];
+    t.classList.toggle('active', names[i] === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+function copyText(id) {
+  const el = document.getElementById(id);
+  navigator.clipboard.writeText(el.textContent).catch(() => {});
+}
+
+checkHealth();
+setInterval(checkHealth, 10000);
+updateGoalHint();
+</script>
+</body>
+</html>
