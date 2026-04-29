@@ -6,6 +6,7 @@
 ![Language](https://img.shields.io/badge/language-C99%20%7C%20Python-orange)
 ![Architectures](https://img.shields.io/badge/arch-x86--64%20%7C%20x86--32%20%7C%20ARM%20%7C%20MIPS-green)
 ![Tests](https://img.shields.io/badge/tests-99%2F99-brightgreen)
+[![Medium](https://img.shields.io/badge/Medium-InfoSec_Write--ups-black?logo=medium)](https://infosecwriteups.com/shellforge-building-a-constraint-aware-shellcode-generator-from-scratch-f57eaea15c78)
 
 ---
 
@@ -71,7 +72,7 @@ C Core (core/build/libshellforge.so)
 ### 1. Build the C core
 
 ```bash
-git clone https://github.com/userIssa/shellforge
+git clone https://github.com/userIssa/genhears
 cd shellforge/core
 bash build.sh
 ```
@@ -225,3 +226,5 @@ For **security research, CTF practice, and authorised penetration testing only**
 [linkedin.com/in/toluwanimi-oderinde](https://linkedin.com/in/toluwanimi-oderinde)
 
 *Built as an MSc-level penetration testing research project.*
+
+**Read the full write-up:** [ShellForge: Building a Constraint-Aware Shellcode Generator from Scratch](https://infosecwriteups.com/shellforge-building-a-constraint-aware-shellcode-generator-from-scratch-f57eaea15c78) — InfoSec Write-ups
